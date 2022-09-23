@@ -2,13 +2,23 @@ import app from "../../src/app";
 import supertest from "supertest";
 import recomendationFactory from "../factory/recomendationFactory"
 import { prisma } from "../../src/database";
+import { Recommendation } from "@prisma/client";
 
 const server = supertest(app)
 
 beforeEach(async()=>{
   await prisma.$executeRaw`TRUNCATE recommendations RESTART IDENTITY`
-})
-describe("Test Insert Recomendation POST / ",()=>{
+});
+afterAll(()=>{
+  prisma.$disconnect
+});
+
+ async function getRecomendationByName(name:string){
+  const recomendation:Recommendation =  await prisma.recommendation.findUnique({where:{name}});
+  return recomendation
+}
+
+describe("Test Insert Recomendation POST /recommendations",()=>{
   it('Test Sending Correct Data Format to Post, Expect 201 and Not Falsy',async()=>{
     const recomendation =  recomendationFactory.allowedRecomendation()
     const result = await server.post("/recommendations").send(recomendation)
@@ -16,17 +26,20 @@ describe("Test Insert Recomendation POST / ",()=>{
     expect(result.status).toBe(201)
     expect(recomendationCreated).not.toBeFalsy()
   });
+
   it('Test Sending Incorrect Name Data Format to Post, Expect 422 and Falsy',async()=>{
     const recomendation = recomendationFactory.wrongNameRecomendation();
     const {name} = recomendation
     const result = await server.post("/recommendations").send(recomendation)
     expect(result.status).toBe(422);
   });
+
   it('Test Sending Incorrect Youtube Link Data Format to Post, expect 422 and Falsy',async()=>{
     const recomendation = recomendationFactory.wrongLinkRecomendation();
     const result = await server.post("/recommendations").send(recomendation)
     expect(result.status).toBe(422)
   });
+
   it('Test Sending Same Recomendation Name to Post, expect 409 and array.length Equal 1',async()=>{
     const recomendation = recomendationFactory.allowedRecomendation()
     await server.post("/recommendations").send(recomendation)
@@ -34,11 +47,30 @@ describe("Test Insert Recomendation POST / ",()=>{
     const recomendationsByName = await prisma.recommendation.findMany({where:{name:recomendation.name}})
     expect(result.status).toBe(409)
     expect(recomendationsByName.length).toBe(1)
-
+    
   });
-})
+});
 
- async function getRecomendationByName(name:string) {
-  const recomendation=  await prisma.recommendation.findUnique({where:{name}})
-  return recomendation
-}
+describe("Test UpVote Recomendation POST /recommendations/:id/upvote",()=>{
+  it('Test UpVote in Correct Recommendation Id, Expect 201 ',async()=>{
+    const {id,score,name} = await recomendationFactory.recomendation();
+    const result = await server.post(`/recommendations/${id}/upvote`).send();
+    const updatedRecommendation = await getRecomendationByName(name) ;
+    const scoreIncreased = updatedRecommendation.score >score;
+    expect(result.status).toBe(200);
+    expect(scoreIncreased).toBeTruthy();
+  });
+  it('Test UpVote Sending nonexistent Recommendation Id, Expect 404',async()=>{
+    const {id,score,name}=await recomendationFactory.recomendation();
+    let fakeId = 0;
+    while(fakeId===id){
+      fakeId=recomendationFactory.randomNumber();
+    }
+    const result = await server.post(`/recommendations/${fakeId}/upvote`);
+    const updatedRecommendation = await getRecomendationByName(name);
+    const scoreIncreased = updatedRecommendation.score>score;
+
+    expect(result.status).toBe(404);
+    expect(scoreIncreased).toBeFalsy();
+  })
+})
