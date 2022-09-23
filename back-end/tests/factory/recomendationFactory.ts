@@ -33,8 +33,8 @@ function randomNumber(){
   return Number(faker.random.numeric(2))
 }
 
-async function recomendation(){
- const recomendation : Recommendation= await prisma.recommendation.create({data:{...allowedRecomendation()}});
+async function recomendation(setData?:any){
+ const recomendation : Recommendation= await prisma.recommendation.create({data:{...allowedRecomendation(),...setData}});
   return recomendation
 }
 

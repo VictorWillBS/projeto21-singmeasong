@@ -51,14 +51,14 @@ describe("Test Insert Recomendation POST /recommendations",()=>{
   });
 });
 
-describe("Test UpVote Recomendation POST /recommendations/:id/upvote",()=>{
-  it('Test UpVote in Correct Recommendation Id, Expect 201 ',async()=>{
+describe("Test UpVote Recommendation POST /recommendations/:id/upvote",()=>{
+  it('Test UpVote in Correct Recommendation Id, Expect 200 ',async()=>{
     const {id,score,name} = await recomendationFactory.recomendation();
     const result = await server.post(`/recommendations/${id}/upvote`).send();
     const updatedRecommendation = await getRecomendationByName(name) ;
-    const scoreIncreased = updatedRecommendation.score >score;
+    const scoreWasIncreased = updatedRecommendation.score >score;
     expect(result.status).toBe(200);
-    expect(scoreIncreased).toBeTruthy();
+    expect(scoreWasIncreased).toBeTruthy();
   });
   it('Test UpVote Sending nonexistent Recommendation Id, Expect 404',async()=>{
     const {id,score,name}=await recomendationFactory.recomendation();
@@ -68,9 +68,39 @@ describe("Test UpVote Recomendation POST /recommendations/:id/upvote",()=>{
     }
     const result = await server.post(`/recommendations/${fakeId}/upvote`);
     const updatedRecommendation = await getRecomendationByName(name);
-    const scoreIncreased = updatedRecommendation.score>score;
+    const isScoreEqual = updatedRecommendation.score===score;
 
     expect(result.status).toBe(404);
-    expect(scoreIncreased).toBeFalsy();
+    expect(isScoreEqual).toBeTruthy();
+  });
+});
+
+describe("Test DownVote Recommendation POST /recommendations/:id/downvote",()=>{
+  it('Test Downvote Sending Correct Recommendation Id, Expect 200',async()=>{
+    const {id,score,name}= await recomendationFactory.recomendation();
+    const result = await server.post(`/recommendations/${id}/downvote`);
+    const updatedRecommendation = await getRecomendationByName(name);
+    const scoreWasDegrade = updatedRecommendation.score<score
+    expect(result.status).toBe(200);
+    expect(scoreWasDegrade).toBeTruthy()
+  });
+  it('Test Downvote Sending Recommendation Id & Score >5, Expect 200 & Recommendation Deleted',async()=>{
+    const {id,name} = await recomendationFactory.recomendation({score:-5});
+    const result = await server.post(`/recommendations/${id}/downvote`);
+    const updatedRecommendation = await getRecomendationByName(name);
+    expect(result.status).toBe(200);
+    expect(updatedRecommendation).toBeFalsy();
+  });
+  it('Test Downvote Sending Nonexistent Recommendation Id, Expect 404', async()=>{
+    const {id,score,name} = await recomendationFactory.recomendation();
+    let fakeId = 0;
+    while(fakeId===id){
+      fakeId = recomendationFactory.randomNumber()
+    }
+    const result = await server.post(`/recommendations/${fakeId}/downvote`);
+    const updatedRecommendation = await getRecomendationByName(name);
+    const isScoreEqual = updatedRecommendation.score === score;
+    expect(result.status).toBe(404);
+    expect(isScoreEqual).toBeTruthy();
   })
 })
