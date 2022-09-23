@@ -33,6 +33,14 @@ function randomNumber(){
   return Number(faker.random.numeric(2))
 }
 
+async function createManyRecomendations(amount:number) {
+  let limit = 1;
+  while(limit<=amount){
+    recomendation()
+    limit++
+  }
+}
+
 async function recomendation(setData?:any){
  const recomendation : Recommendation= await prisma.recommendation.create({data:{...allowedRecomendation(),...setData}});
   return recomendation
@@ -43,5 +51,6 @@ export default {
   wrongNameRecomendation,
   wrongLinkRecomendation,
   recomendation,
-  randomNumber
+  randomNumber,
+  createManyRecomendations
 }
