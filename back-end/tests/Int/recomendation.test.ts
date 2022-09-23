@@ -109,8 +109,8 @@ describe("Test DownVote Recommendation POST /recommendations/:id/downvote", () =
   })
 })
 
-describe("Test Get Recommendations Route GET /recommendations", () => {
-  it('Test Get Last 10 Recommendation, Expect 200 and Array', async () => {
+describe("Test Get Last 10 Recommendations GET /recommendations", () => {
+  it('Test Get Last 10 Recommendation, Bank Filled, Expect 200 and Array', async () => {
     await recomendationFactory.createManyRecomendations(13);
     const result = await server.get('/recommendations');
     console.log(result.body.length)
@@ -118,7 +118,7 @@ describe("Test Get Recommendations Route GET /recommendations", () => {
     expect(result.body).toBeInstanceOf(Array);
     expect(result.body.length).toBeLessThanOrEqual(10);
   });
-  it('Test Get Last 10 Recommendation, But with Empty DataBanks. Expect 200 and Empty Array',async()=>{
+  it('Test Get Last 10 Recommendation, But with Empty DataBank. Expect 200 and Empty Array',async()=>{
     const result = await server.get('/recommendations');
     expect(result.status).toBe(200);
     expect(result.body).toBeInstanceOf(Array);
