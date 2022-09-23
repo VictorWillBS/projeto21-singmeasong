@@ -57,6 +57,7 @@ describe("Test UpVote Recommendation POST /recommendations/:id/upvote",()=>{
     const result = await server.post(`/recommendations/${id}/upvote`).send();
     const updatedRecommendation = await getRecomendationByName(name) ;
     const scoreWasIncreased = updatedRecommendation.score >score;
+
     expect(result.status).toBe(200);
     expect(scoreWasIncreased).toBeTruthy();
   });
@@ -80,14 +81,16 @@ describe("Test DownVote Recommendation POST /recommendations/:id/downvote",()=>{
     const {id,score,name}= await recomendationFactory.recomendation();
     const result = await server.post(`/recommendations/${id}/downvote`);
     const updatedRecommendation = await getRecomendationByName(name);
-    const scoreWasDegrade = updatedRecommendation.score<score
+    const scoreWasDegrade = updatedRecommendation.score<score;
+
     expect(result.status).toBe(200);
-    expect(scoreWasDegrade).toBeTruthy()
+    expect(scoreWasDegrade).toBeTruthy();
   });
   it('Test Downvote Sending Recommendation Id & Score >5, Expect 200 & Recommendation Deleted',async()=>{
     const {id,name} = await recomendationFactory.recomendation({score:-5});
     const result = await server.post(`/recommendations/${id}/downvote`);
     const updatedRecommendation = await getRecomendationByName(name);
+
     expect(result.status).toBe(200);
     expect(updatedRecommendation).toBeFalsy();
   });
@@ -95,11 +98,12 @@ describe("Test DownVote Recommendation POST /recommendations/:id/downvote",()=>{
     const {id,score,name} = await recomendationFactory.recomendation();
     let fakeId = 0;
     while(fakeId===id){
-      fakeId = recomendationFactory.randomNumber()
+      fakeId = recomendationFactory.randomNumber();
     }
     const result = await server.post(`/recommendations/${fakeId}/downvote`);
     const updatedRecommendation = await getRecomendationByName(name);
     const isScoreEqual = updatedRecommendation.score === score;
+
     expect(result.status).toBe(404);
     expect(isScoreEqual).toBeTruthy();
   })
