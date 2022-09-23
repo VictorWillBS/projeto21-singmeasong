@@ -118,10 +118,20 @@ describe("Test Get Last 10 Recommendations GET /recommendations", () => {
     expect(result.body).toBeInstanceOf(Array);
     expect(result.body.length).toBeLessThanOrEqual(10);
   });
-  it('Test Get Last 10 Recommendation, But with Empty DataBank. Expect 200 and Empty Array',async()=>{
+  it('Test Get Last 10 Recommendation,Empty Bank. Expect 200 and Empty Array',async()=>{
     const result = await server.get('/recommendations');
     expect(result.status).toBe(200);
     expect(result.body).toBeInstanceOf(Array);
     expect(result.body.length).toBe(0);
+  })
+})
+
+describe("Test Get Recommendation by Id GET /recommendations/:id",()=>{
+  it('Test Get Recommendation Sending Existent Id. Expect 200 and Recommendation Object',async()=>{
+    const recomendation = await recomendationFactory.recomendation();
+    const result = await server.get(`/recommendations/${recomendation.id}`)
+    expect(result.status).toBe(200);
+    expect(result.body).toBeInstanceOf(Object)
+    expect(result.body).toEqual(recomendation)
   })
 })
