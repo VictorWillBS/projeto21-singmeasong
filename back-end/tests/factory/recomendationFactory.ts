@@ -9,7 +9,7 @@ import {faker} from '@faker-js/faker';
 }
 
  function wrongNameRecomendation(){
-
+    
   const youtubeLink = `https://www.youtube.com/${faker.lorem.words()}`
   return{
     name:Number(faker.random.numeric()),

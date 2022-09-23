@@ -22,8 +22,20 @@ describe("Test Insert Recomendation POST / ",()=>{
     const result = await server.post("/recommendations").send(recomendation)
     expect(result.status).toBe(422);
   });
-  it.todo('Test Sending Incorrect Youtube Link Data Format to Post, expect 422 and Falsy');
-  it.todo('Test Sending Same Recomendation Name to Post, expect 409 and array.length Equal 1');
+  it('Test Sending Incorrect Youtube Link Data Format to Post, expect 422 and Falsy',async()=>{
+    const recomendation = recomendationFactory.wrongLinkRecomendation();
+    const result = await server.post("/recommendations").send(recomendation)
+    expect(result.status).toBe(422)
+  });
+  it('Test Sending Same Recomendation Name to Post, expect 409 and array.length Equal 1',async()=>{
+    const recomendation = recomendationFactory.allowedRecomendation()
+    await server.post("/recommendations").send(recomendation)
+    const result = await server.post("/recommendations").send(recomendation)
+    const recomendationsByName = await prisma.recommendation.findMany({where:{name:recomendation.name}})
+    expect(result.status).toBe(409)
+    expect(recomendationsByName.length).toBe(1)
+
+  });
 })
 
  async function getRecomendationByName(name:string) {
