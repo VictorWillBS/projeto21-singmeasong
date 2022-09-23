@@ -106,24 +106,23 @@ describe("Test DownVote Recommendation POST /recommendations/:id/downvote", () =
 
     expect(result.status).toBe(404);
     expect(isScoreEqual).toBeTruthy();
-  })
+  });
 })
 
 describe("Test Get Last 10 Recommendations GET /recommendations", () => {
   it('Test Get Last 10 Recommendation, Bank Filled, Expect 200 and Array', async () => {
-    await recomendationFactory.createManyRecomendations(13);
+    const allRecomendations = await recomendationFactory.createManyRecomendations(11);
     const result = await server.get('/recommendations');
-    console.log(result.body.length)
+    console.log(result.body)
     expect(result.status).toBe(200);
-    expect(result.body).toBeInstanceOf(Array);
-    expect(result.body.length).toBeLessThanOrEqual(10);
+    expect(result.body).toEqual(allRecomendations);
   });
   it('Test Get Last 10 Recommendation,Empty Bank. Expect 200 and Empty Array',async()=>{
     const result = await server.get('/recommendations');
     expect(result.status).toBe(200);
     expect(result.body).toBeInstanceOf(Array);
     expect(result.body.length).toBe(0);
-  })
+  });
 })
 
 describe("Test Get Recommendation by Id GET /recommendations/:id",()=>{
@@ -131,7 +130,33 @@ describe("Test Get Recommendation by Id GET /recommendations/:id",()=>{
     const recomendation = await recomendationFactory.recomendation();
     const result = await server.get(`/recommendations/${recomendation.id}`)
     expect(result.status).toBe(200);
-    expect(result.body).toBeInstanceOf(Object)
-    expect(result.body).toEqual(recomendation)
+    expect(result.body).toEqual(recomendation);
+  });
+  it('Test Get Recommendation Sending Nonexistent Id.Expect 404',async()=>{
+    const recomendation = await recomendationFactory.recomendation();
+    let fakeId=0;
+    while(fakeId===recomendation.id){
+      fakeId = recomendationFactory.randomNumber();
+    }
+    const result = await server.get(`/recommendations/${fakeId}`);
+    expect(result.status).toBe(404);
+    expect(result.body).toEqual({});
   })
+})
+
+describe("Test Get Random Recommendation GET /recommendations/random",()=>{
+  it.todo('Test get Random Recommendation. Expect 200 and Random Recommendation Object')
+  it.todo('Test get Random Recommendation. Empty Bank. Expect 404.')
+  it.todo('Test get Random Recommendation. Only Score < 10. Expect 200 and Score < 10 Recommendation Object')
+  it.todo('Test get Random Recommendation. Only Score >  10. Expect 200 and Score > 10 Recommendation Object')
+});
+
+describe("Test Get Amount of Recommendation Order by Score GET /recommendations/top/:amount",()=>{
+  it.todo('Test get Random Amount TOP Recommendation. Expect 200 and Random Amount TOP Recommendation Object')
+  it.todo('Test get 13 TOP Recommendation. Expect 200 and 13 TOP Recommendation Object')
+  it.todo('Test get 0 TOP Recommendation. Expect 200 and Empty Object');
+  it.todo('Test get BD Registere < Amout TOP Recommendation. Expect 200 and All Recomendations Object')
+
+
+  
 })

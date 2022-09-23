@@ -35,10 +35,22 @@ function randomNumber(){
 
 async function createManyRecomendations(amount:number) {
   let limit = 1;
+  const allRecommendations:Recommendation[]=[]
   while(limit<=amount){
-    recomendation()
+    const recommendationCreated:Recommendation = await recomendation()
+    allRecommendations.push(recommendationCreated)
     limit++
   }
+
+  if(allRecommendations.length>10){
+    const newAllRecommendations = allRecommendations.reverse();
+    const sliceLimit = allRecommendations.length-(allRecommendations.length-10)
+    return newAllRecommendations.slice(0,sliceLimit)
+  }else{
+
+    return allRecommendations.reverse()
+  }
+
 }
 
 async function recomendation(setData?:any){
