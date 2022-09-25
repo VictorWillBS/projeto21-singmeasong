@@ -1,39 +1,40 @@
-import { faker } from '@faker-js/faker';
-import { Recommendation } from '@prisma/client';
-import { prisma } from '../../src/database';
-import { CreateRecommendationData } from '../../src/services/recommendationsService';
-
+import { faker } from "@faker-js/faker";
+import { Recommendation } from "@prisma/client";
+import { prisma } from "../../src/database";
+import { CreateRecommendationData } from "../../src/services/recommendationsService";
 
 function allowedRecomendation(): CreateRecommendationData {
   const youtubeLink = `https://www.youtube.com/${faker.lorem.words(1)}`;
   return {
     name: faker.name.firstName(),
-    youtubeLink
-  }
+    youtubeLink,
+  };
 }
 
-function wrongNameRecomendation(): { name: any, youtubeLink: string } {
-
+function wrongNameRecomendation(): { name: number; youtubeLink: string } {
   const youtubeLink = `https://www.youtube.com/${faker.lorem.words()}`;
   return {
     name: Number(faker.random.numeric()),
-    youtubeLink
-  }
+    youtubeLink,
+  };
 }
 
 function wrongLinkRecomendation(): CreateRecommendationData {
   const youtubeLink = faker.internet.url();
   return {
     name: faker.name.firstName(),
-    youtubeLink
-  }
+    youtubeLink,
+  };
 }
 
-function randomNumber(setArrange?:{min:number,max:number}):number {
-  return faker.datatype.number({...setArrange})
+function randomNumber(setArrange?: { min: number; max: number }): number {
+  return faker.datatype.number({ ...setArrange });
 }
 
-async function createManyRecomendations(amount: number, custom?: { isRandomScore?: boolean, returnlimit?: number }) {
+async function createManyRecomendations(
+  amount: number,
+  custom?: { isRandomScore?: boolean; returnlimit?: number }
+) {
   let limit = 1;
   const allRecommendations: Recommendation[] = [];
   const isRandomScore = custom.isRandomScore || false;
@@ -48,33 +49,37 @@ async function createManyRecomendations(amount: number, custom?: { isRandomScore
         score: faker.datatype.number({
           max: 20,
           min: -4,
-        })
-      }
-      const recommendationCreated: Recommendation = await recomendation(setData);
+        }),
+      };
+      const recommendationCreated: Recommendation = await recomendation(
+        setData
+      );
       allRecommendations.push(recommendationCreated);
       limit++;
     }
   }
 
   if (returnLimit) {
-    return formatReturnLastCreated(allRecommendations, returnLimit)
+    return formatReturnLastCreated(allRecommendations, returnLimit);
   }
 
-  return allRecommendations
+  return allRecommendations;
 }
 
-async function recomendation(setData?: {}) {
-  const recomendation: Recommendation = await prisma.recommendation.create({ data: { ...allowedRecomendation(), ...setData } });
-  return recomendation
+async function recomendation(setData?: Partial<Recommendation>) {
+  const recomendation: Recommendation = await prisma.recommendation.create({
+    data: { ...allowedRecomendation(), ...setData },
+  });
+  return recomendation;
 }
 
 function formatReturnLastCreated(list: Recommendation[], limit: number) {
   if (list.length > limit) {
     const newAllRecommendations = list.reverse();
-    const sliceLimit = list.length - (list.length - limit)
-    return newAllRecommendations.slice(0, sliceLimit)
+    const sliceLimit = list.length - (list.length - limit);
+    return newAllRecommendations.slice(0, sliceLimit);
   } else {
-    return list.reverse()
+    return list.reverse();
   }
 }
 
@@ -84,5 +89,5 @@ export default {
   wrongLinkRecomendation,
   recomendation,
   randomNumber,
-  createManyRecomendations
-}
+  createManyRecomendations,
+};
