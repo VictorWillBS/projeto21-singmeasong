@@ -5,7 +5,7 @@ import { CreateRecommendationData } from '../../src/services/recommendationsServ
 
 
 function allowedRecomendation(): CreateRecommendationData {
-  const youtubeLink = `https://www.youtube.com/${faker.lorem.words()}`;
+  const youtubeLink = `https://www.youtube.com/${faker.lorem.words(1)}`;
   return {
     name: faker.name.firstName(),
     youtubeLink

@@ -178,15 +178,28 @@ describe("Test Get Amount of Recommendation Order by Score GET /recommendations/
 
     await recomendationFactory.createManyRecomendations(qntRecommendations,{isRandomScore:true});
     const result =await server.get(`/recommendations/top/${amountRecommendations}`);
-    const recomendations:Recommendation[] = await prisma.recommendation.findMany({take:amountRecommendations,orderBy:{score:"desc"}})
+    const recomendations:Recommendation[] = await prisma.recommendation.findMany({take:amountRecommendations,orderBy:{score:"desc"}});
     
-    expect(result.status).toBe(200)
-    expect(result.body).toEqual(recomendations)
-
+    expect(result.status).toBe(200);
+    expect(result.body).toEqual(recomendations);
   })
-  it.todo('Test get 13 TOP Recommendation. Expect 200 and 13 TOP Recommendation Object')
-  it.todo('Test get 0 TOP Recommendation. Expect 200 and Empty Object');
-  it.todo('Test get BD Registere < Amout TOP Recommendation. Expect 200 and All Recomendations Object')
+  it('Test get 0 TOP Recommendation. Expect 200 and Empty Object',async()=>{
+    const numberLimit = {min:5,max:15};
+    const qntRecommendations = recomendationFactory.randomNumber(numberLimit);
+    await recomendationFactory.createManyRecomendations(qntRecommendations,{isRandomScore:true});
+    const result = await server.get(`/recommendations/top/0`);
+    expect(result.status).toBe(200);
+    expect(result.body).toStrictEqual([]);
+  });
+  it('Test get BD Registers < Amount TOP Recommendation. Expect 200 and All Recomendations Object',async()=>{
+    const numberLimit = {min:5,max:15};
+    const qntRecommendations = recomendationFactory.randomNumber(numberLimit);
+    await recomendationFactory.createManyRecomendations(qntRecommendations,{isRandomScore:true});
+    const recomendations:Recommendation[] = await prisma.recommendation.findMany({orderBy:{score:"desc"}});
+    const result = await server.get(`/recommendations/top/20`);
+    expect(result.status).toBe(200);
+    expect(result.body).toStrictEqual(recomendations);
+  })
 
 
 
