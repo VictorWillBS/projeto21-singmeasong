@@ -172,8 +172,17 @@ describe("Test Get Random Recommendation GET /recommendations/random", () => {
 
 describe("Test Get Amount of Recommendation Order by Score GET /recommendations/top/:amount", () => {
   it('Test get Random Amount TOP Recommendation. Expect 200 and Random Amount TOP Recommendation Object',async()=>{
-    const qntRecomendation = recomendationFactory.randomNumber()
-    await recomendationFactory.createManyRecomendations(15,{isRandomScore:true})
+    const numberLimit = {min:5,max:15}
+    const qntRecommendations = recomendationFactory.randomNumber(numberLimit);
+    const amountRecommendations =recomendationFactory.randomNumber(numberLimit);
+
+    await recomendationFactory.createManyRecomendations(qntRecommendations,{isRandomScore:true});
+    const result =await server.get(`/recommendations/top/${amountRecommendations}`);
+    const recomendations:Recommendation[] = await prisma.recommendation.findMany({take:amountRecommendations,orderBy:{score:"desc"}})
+    
+    expect(result.status).toBe(200)
+    expect(result.body).toEqual(recomendations)
+
   })
   it.todo('Test get 13 TOP Recommendation. Expect 200 and 13 TOP Recommendation Object')
   it.todo('Test get 0 TOP Recommendation. Expect 200 and Empty Object');

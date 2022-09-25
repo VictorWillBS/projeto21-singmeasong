@@ -29,8 +29,8 @@ function wrongLinkRecomendation(): CreateRecommendationData {
   }
 }
 
-function randomNumber() {
-  return Number(faker.random.numeric(2))
+function randomNumber(setArrange?:{min:number,max:number}):number {
+  return faker.datatype.number({...setArrange})
 }
 
 async function createManyRecomendations(amount: number, custom?: { isRandomScore?: boolean, returnlimit?: number }) {
