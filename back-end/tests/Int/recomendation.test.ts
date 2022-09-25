@@ -3,6 +3,7 @@ import supertest from "supertest";
 import recomendationFactory from "../factory/recomendationFactory"
 import { prisma } from "../../src/database";
 import { Recommendation } from "@prisma/client";
+import { faker } from "@faker-js/faker";
 
 const server = supertest(app)
 
@@ -110,14 +111,14 @@ describe("Test DownVote Recommendation POST /recommendations/:id/downvote", () =
 })
 
 describe("Test Get Last 10 Recommendations GET /recommendations", () => {
-  it('Test Get Last 10 Recommendation, Bank Filled, Expect 200 and Array', async () => {
-    const allRecomendations = await recomendationFactory.createManyRecomendations(11);
+  it('Test Get Last 10 Recommendation With Bank Filled, Expect 200 and Array', async () => {
+    const allRecomendations = await recomendationFactory.createManyRecomendations(11, { returnlimit: 10 });
     const result = await server.get('/recommendations');
     console.log(result.body)
     expect(result.status).toBe(200);
     expect(result.body).toEqual(allRecomendations);
   });
-  it('Test Get Last 10 Recommendation,Empty Bank. Expect 200 and Empty Array',async()=>{
+  it('Test Get Last 10 Recommendation With Empty Bank. Expect 200 and Empty Array', async () => {
     const result = await server.get('/recommendations');
     expect(result.status).toBe(200);
     expect(result.body).toBeInstanceOf(Array);
@@ -125,17 +126,17 @@ describe("Test Get Last 10 Recommendations GET /recommendations", () => {
   });
 })
 
-describe("Test Get Recommendation by Id GET /recommendations/:id",()=>{
-  it('Test Get Recommendation Sending Existent Id. Expect 200 and Recommendation Object',async()=>{
+describe("Test Get Recommendation by Id GET /recommendations/:id", () => {
+  it('Test Get Recommendation Sending Existent Id. Expect 200 and Recommendation Object', async () => {
     const recomendation = await recomendationFactory.recomendation();
     const result = await server.get(`/recommendations/${recomendation.id}`)
     expect(result.status).toBe(200);
-    expect(result.body).toEqual(recomendation);
+    expect(result.body).toStrictEqual(recomendation);
   });
-  it('Test Get Recommendation Sending Nonexistent Id.Expect 404',async()=>{
+  it('Test Get Recommendation Sending Nonexistent Id.Expect 404', async () => {
     const recomendation = await recomendationFactory.recomendation();
-    let fakeId=0;
-    while(fakeId===recomendation.id){
+    let fakeId = 0;
+    while (fakeId === recomendation.id) {
       fakeId = recomendationFactory.randomNumber();
     }
     const result = await server.get(`/recommendations/${fakeId}`);
@@ -144,19 +145,40 @@ describe("Test Get Recommendation by Id GET /recommendations/:id",()=>{
   })
 })
 
-describe("Test Get Random Recommendation GET /recommendations/random",()=>{
-  it.todo('Test get Random Recommendation. Expect 200 and Random Recommendation Object')
-  it.todo('Test get Random Recommendation. Empty Bank. Expect 404.')
+describe("Test Get Random Recommendation GET /recommendations/random", () => {
+  it('Test get Random Recommendation. Expect 200 and Random Recommendation Object', async () => {
+
+    const recomendations = await recomendationFactory.createManyRecomendations(15, { isRandomScore: true });
+    console.log(recomendations);
+    const result = await server.get('/recommendations/random');
+    const recomendationFound = recomendations.filter((recomendation, i) => {
+      if (recomendation.id === result.body.id) {
+        return recomendation
+      } else if (i === recomendations.length - 1) {
+        return 0
+      }
+    });
+    expect(result.status).toBe(200);
+    expect(result.body).toStrictEqual(recomendationFound[0]);
+  })
+  it('Test get Random Recommendation. Empty Bank. Expect 404.', async () => {
+    const result = await server.get('/recommendations/random');
+    expect(result.status).toBe(404);
+    expect(result.body).toStrictEqual({});
+  })
   it.todo('Test get Random Recommendation. Only Score < 10. Expect 200 and Score < 10 Recommendation Object')
   it.todo('Test get Random Recommendation. Only Score >  10. Expect 200 and Score > 10 Recommendation Object')
 });
 
-describe("Test Get Amount of Recommendation Order by Score GET /recommendations/top/:amount",()=>{
-  it.todo('Test get Random Amount TOP Recommendation. Expect 200 and Random Amount TOP Recommendation Object')
+describe("Test Get Amount of Recommendation Order by Score GET /recommendations/top/:amount", () => {
+  it('Test get Random Amount TOP Recommendation. Expect 200 and Random Amount TOP Recommendation Object',async()=>{
+    const qntRecomendation = recomendationFactory.randomNumber()
+    await recomendationFactory.createManyRecomendations(15,{isRandomScore:true})
+  })
   it.todo('Test get 13 TOP Recommendation. Expect 200 and 13 TOP Recommendation Object')
   it.todo('Test get 0 TOP Recommendation. Expect 200 and Empty Object');
   it.todo('Test get BD Registere < Amout TOP Recommendation. Expect 200 and All Recomendations Object')
 
 
-  
+
 })
