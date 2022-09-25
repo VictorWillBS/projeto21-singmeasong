@@ -114,7 +114,6 @@ describe("Test Get Last 10 Recommendations GET /recommendations", () => {
   it('Test Get Last 10 Recommendation With Bank Filled, Expect 200 and Array', async () => {
     const allRecomendations = await recomendationFactory.createManyRecomendations(11, { returnlimit: 10 });
     const result = await server.get('/recommendations');
-    console.log(result.body)
     expect(result.status).toBe(200);
     expect(result.body).toEqual(allRecomendations);
   });
@@ -149,7 +148,6 @@ describe("Test Get Random Recommendation GET /recommendations/random", () => {
   it('Test get Random Recommendation. Expect 200 and Random Recommendation Object', async () => {
 
     const recomendations = await recomendationFactory.createManyRecomendations(15, { isRandomScore: true });
-    console.log(recomendations);
     const result = await server.get('/recommendations/random');
     const recomendationFound = recomendations.filter((recomendation, i) => {
       if (recomendation.id === result.body.id) {
