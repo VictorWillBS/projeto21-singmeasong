@@ -102,6 +102,7 @@ describe("test Downvote Function", () => {
     expect(recommendationRepository.find).toBeCalled();
     expect(recommendationRepository.updateScore).toBeCalled();
   });
+
   it("Test Downvote Recommendation score < -5, expect to try exclude Recommendation", async () => {
     const recommendation = {
       ...recommendationFactory.allowedRecomendation(),
@@ -125,5 +126,33 @@ describe("test Downvote Function", () => {
     expect(recommendationRepository.find).toBeCalled();
     expect(recommendationRepository.updateScore).toBeCalled();
     expect(recommendationRepository.remove).toBeCalled();
+  });
+});
+
+describe("Test Get By Id Or Fail Function", () => {
+  it("Test get Recommendation by Id Sending Valid Id", async () => {
+    const recommendation = {
+      ...recommendationFactory.allowedRecomendation(),
+      id: 1,
+      score: 15,
+    };
+    jest
+      .spyOn(recommendationRepository, "find")
+      .mockResolvedValueOnce(recommendation);
+    const result = await recommendationService.getById(recommendation.id);
+    expect(result).toStrictEqual(recommendation);
+    expect(recommendationRepository.find).toBeCalled();
+  });
+  it("Test get Recommendation by Id Sending Nonexistent Id", async () => {
+    jest
+      .spyOn(recommendationRepository, "find")
+      .mockResolvedValueOnce(undefined);
+
+    const result = recommendationService.getById(1);
+    expect(result).rejects.toStrictEqual({
+      type: "not_found",
+      message: "",
+    });
+    expect(recommendationRepository.find).toBeCalled();
   });
 });

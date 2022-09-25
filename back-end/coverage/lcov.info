@@ -14,7 +14,7 @@ FNH:4
 FNDA:2,insert
 FNDA:2,upvote
 FNDA:2,downvote
-FNDA:4,getByIdOrFail
+FNDA:6,getByIdOrFail
 FNDA:0,get
 FNDA:0,getTop
 FNDA:0,getRandom
@@ -32,9 +32,9 @@ DA:24,2
 DA:26,2
 DA:31,2
 DA:32,1
-DA:37,4
-DA:38,4
-DA:40,3
+DA:37,6
+DA:38,6
+DA:40,4
 DA:44,0
 DA:48,0
 DA:52,0
@@ -56,7 +56,7 @@ LF:32
 LH:16
 BRDA:11,0,0,1
 BRDA:31,1,0,1
-BRDA:38,2,0,1
+BRDA:38,2,0,2
 BRDA:56,3,0,0
 BRDA:70,4,0,0
 BRDA:78,5,0,0
