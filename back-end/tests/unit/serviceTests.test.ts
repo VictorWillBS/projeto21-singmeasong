@@ -156,3 +156,30 @@ describe("Test Get By Id Or Fail Function", () => {
     expect(recommendationRepository.find).toBeCalled();
   });
 });
+
+describe("Test Get Function", () => {
+  it("Test get All recommendations", async () => {
+    const recommendations =
+      await recommendationFactory.createManyRecomendations(11, {
+        isRandomScore: true,
+        returnlimit: 10,
+      });
+
+    jest
+      .spyOn(recommendationRepository, "findAll")
+      .mockResolvedValueOnce(recommendations);
+
+    const result = await recommendationService.get();
+
+    expect(result).toStrictEqual(recommendations);
+    expect(recommendationRepository.findAll).toBeCalled();
+  });
+  it("Test Get all Recommendations with Empty Bank", async () => {
+    jest
+      .spyOn(recommendationRepository, "findAll")
+      .mockResolvedValueOnce(undefined);
+    const result = await recommendationService.get();
+    expect(result).toBeUndefined();
+    expect(recommendationRepository.findAll).toBeCalled();
+  });
+});
