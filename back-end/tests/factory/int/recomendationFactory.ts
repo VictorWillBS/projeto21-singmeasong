@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker";
 import { Recommendation } from "@prisma/client";
-import { prisma } from "../../src/database";
-import { CreateRecommendationData } from "../../src/services/recommendationsService";
+import { prisma } from "../../../src/database";
+import { CreateRecommendationData } from "../../../src/services/recommendationsService";
 
 function allowedRecomendation(): CreateRecommendationData {
   const youtubeLink = `https://www.youtube.com/${faker.lorem.words(1)}`;

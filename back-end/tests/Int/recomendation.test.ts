@@ -1,6 +1,6 @@
 import app from "../../src/app";
 import supertest from "supertest";
-import recomendationFactory from "../factory/recomendationFactory";
+import recomendationFactory from "../factory/int/recomendationFactory";
 import { prisma } from "../../src/database";
 import { Recommendation } from "@prisma/client";
 
