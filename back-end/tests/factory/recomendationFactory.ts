@@ -60,7 +60,7 @@ async function createManyRecomendations(
   }
 
   if (returnLimit) {
-    return formatReturnLastCreated(allRecommendations, returnLimit);
+    return returnArrayByNewest(allRecommendations, returnLimit);
   }
 
   return allRecommendations;
@@ -72,8 +72,7 @@ async function recomendation(setData?: Partial<Recommendation>) {
   });
   return recomendation;
 }
-
-function formatReturnLastCreated(list: Recommendation[], limit: number) {
+function returnArrayByNewest(list: Recommendation[], limit: number) {
   if (list.length > limit) {
     const newAllRecommendations = list.reverse();
     const sliceLimit = list.length - (list.length - limit);
@@ -82,7 +81,28 @@ function formatReturnLastCreated(list: Recommendation[], limit: number) {
     return list.reverse();
   }
 }
-
+// function returnArrayByScoreOrder(list: Recommendation[], order: string) {
+//   if (order === "desc") {
+//     list.sort((prev: Recommendation, curr: Recommendation): any => {
+//       if (prev.score > curr.score) {
+//         return -1;
+//       } else {
+//         return true;
+//       }
+//     });
+//     return list;
+//   }
+//   if (order === "asc") {
+//     list.sort((prev: Recommendation, curr: Recommendation): any => {
+//       if (prev.score < curr.score) {
+//         return -1;
+//       } else {
+//         return true;
+//       }
+//     });
+//     return list;
+//   }
+// }
 export default {
   allowedRecomendation,
   wrongNameRecomendation,
